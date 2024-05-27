@@ -9,5 +9,5 @@ const (
 
 var (
 	BlinkersActiveStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#33FF57")).Align(lipgloss.Center)
-	BlinkersInactiveStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF")).Align(lipgloss.Center)
+	BlinkersInactiveStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#808080")).Align(lipgloss.Center)
 )

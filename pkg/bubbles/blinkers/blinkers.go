@@ -66,6 +66,11 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) View() string {
 	s := left + strings.Repeat(" ", m.Spacing) + right
+
+	if len(s) > m.Width {
+		return ""
+	}
+
 	if m.blinking && m.on {
 		return BlinkersActiveStyle.Render(s)
 	}
@@ -97,6 +102,6 @@ func New() Model {
 		blinking: false,
 		Spacing:  10,
 		on:       false,
-		Width:    12,
+		Width:    20,
 	}
 }
