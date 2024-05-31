@@ -52,6 +52,7 @@ func InitTeaProgramModel(cfg args.Args) tea.Model {
 	sm := statdash.New()
 
 	m := program.Model{
+		Flag:     "ctf{wroooom}",
 		ApiAddr:  cfg.Addr,
 		Sub:      make(chan api.UpdatePostData),
 		Blinkers: bm,

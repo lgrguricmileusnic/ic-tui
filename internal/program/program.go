@@ -71,7 +71,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// win condition msg
 	case api.WinMsg:
 		m.displayFlag = true
-		return m, tea.Quit
+		return m, nil
 
 	// progress messages
 	case progress.FrameMsg:
@@ -101,6 +101,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	if m.displayFlag {
+		return lipgloss.Place(m.window.width, m.window.heigth, lipgloss.Center, lipgloss.Center, fmt.Sprintf("The flag is \"%s\"", m.Flag))
+	}
 	sm := m.Speedbar.View()
 	sd := m.Statdash.View()
 	ic := styles.IcStyle.Render(lipgloss.JoinVertical(lipgloss.Center,
