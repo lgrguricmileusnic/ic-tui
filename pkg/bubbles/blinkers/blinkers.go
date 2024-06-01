@@ -6,6 +6,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
@@ -26,6 +27,7 @@ type Model struct {
 	on       bool
 	Spacing  int
 	Width    int
+	styles   styles
 }
 
 type TickMsg struct {
@@ -72,9 +74,9 @@ func (m Model) View() string {
 	}
 
 	if m.blinking && m.on {
-		return BlinkersActiveStyle.Render(s)
+		return m.styles.on.Render(s)
 	}
-	return BlinkersInactiveStyle.Render(s)
+	return m.styles.off.Render(s)
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -96,12 +98,26 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, nil
 }
 
-func New() Model {
-	return Model{
+type Option func(*Model)
+
+func WithRenderer(r *lipgloss.Renderer) Option {
+	return func(m *Model) {
+		m.styles = makeStyles(r)
+	}
+}
+
+func New(opts ...Option) Model {
+	m := Model{
 		ID:       nextID(),
 		blinking: false,
 		Spacing:  10,
 		on:       false,
 		Width:    20,
+		styles:   makeStyles(lipgloss.DefaultRenderer()),
 	}
+
+	for _, opt := range opts {
+		opt(&m)
+	}
+	return m
 }

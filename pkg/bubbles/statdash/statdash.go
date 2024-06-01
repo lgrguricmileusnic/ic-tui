@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
@@ -25,6 +26,7 @@ type Model struct {
 	ID     int
 	Width  int
 	status [5]bool
+	styles styles
 }
 
 type LedStatusMsg struct {
@@ -46,12 +48,12 @@ func (m Model) View() string {
 	rLeds := make([]string, 5)
 	for i, led := range leds {
 		if m.status[i] {
-			rLeds[i] = LedOnStyle.Render(led)
+			rLeds[i] = m.styles.on.Render(led)
 		} else {
-			rLeds[i] = LedOffStyle.Render(led)
+			rLeds[i] = m.styles.off.Render(led)
 		}
 	}
-	return StatDashStyle.Render(strings.Join(rLeds, strings.Repeat(" ", 6)))
+	return m.styles.dash.Render(strings.Join(rLeds, strings.Repeat(" ", 6)))
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -72,9 +74,21 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	}
 }
 
-func New() Model {
-	return Model{
-		ID:    nextID(),
-		Width: 21,
+type Option func(*Model)
+
+func WithRenderer(r *lipgloss.Renderer) Option {
+	return func(m *Model) {
+		m.styles = makeStyles(r)
 	}
+}
+func New(opts ...Option) Model {
+	m := Model{
+		ID:     nextID(),
+		Width:  21,
+		styles: makeStyles(lipgloss.DefaultRenderer()),
+	}
+	for _, opt := range opts {
+		opt(&m)
+	}
+	return m
 }

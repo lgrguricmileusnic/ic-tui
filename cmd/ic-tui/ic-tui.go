@@ -10,24 +10,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
 	"github.com/charmbracelet/wish"
 	"github.com/charmbracelet/wish/activeterm"
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/charmbracelet/wish/logging"
-	"github.com/lgrguricmileusnic/ic-tui/internal/api"
 	"github.com/lgrguricmileusnic/ic-tui/internal/args"
 	"github.com/lgrguricmileusnic/ic-tui/internal/program"
-	"github.com/lgrguricmileusnic/ic-tui/pkg/bubbles/blinkers"
-	"github.com/lgrguricmileusnic/ic-tui/pkg/bubbles/statdash"
 )
 
 const (
-	sshHost = "localhost"
-	sshPort = "1234"
+	sshHost = "0.0.0.0"
+	sshPort = "22"
 )
 
 func main() {
@@ -40,30 +37,11 @@ func main() {
 	}
 }
 
-func InitTeaProgramModel(cfg args.Args) tea.Model {
-	// Progress model init
-	pm := progress.New(progress.WithSolidFill("#FFC300"))
-	pm.ShowPercentage = false
-
-	// Blinkers model init
-	bm := blinkers.New()
-
-	// Status Dashboard model init
-	sm := statdash.New()
-
-	m := program.Model{
-		Flag:     "ctf{wroooom}",
-		ApiAddr:  cfg.Addr,
-		Sub:      make(chan api.UpdatePostData),
-		Blinkers: bm,
-		Speedbar: pm,
-		Statdash: sm}
-	return m
-}
-
 func teaHandlerWrapper(cfg args.Args) func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-		pm := InitTeaProgramModel(cfg)
+
+		r := bubbletea.MakeRenderer(s)
+		pm := program.New(cfg.Addr, "ctf{wroooom}", r)
 
 		return pm, []tea.ProgramOption{tea.WithAltScreen()}
 	}
@@ -106,7 +84,7 @@ func startWish(cfg args.Args) {
 }
 
 func startLocal(cfg args.Args) {
-	pm := InitTeaProgramModel(cfg)
+	pm := program.New(cfg.Addr, "ctf{wroooom}", lipgloss.DefaultRenderer())
 	p := tea.NewProgram(pm, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Println("could not start program:", err)

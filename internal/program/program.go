@@ -7,7 +7,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/lgrguricmileusnic/ic-tui/internal/api"
-	"github.com/lgrguricmileusnic/ic-tui/internal/styles"
 
 	"github.com/lgrguricmileusnic/ic-tui/pkg/bubbles/blinkers"
 	"github.com/lgrguricmileusnic/ic-tui/pkg/bubbles/statdash"
@@ -35,6 +34,7 @@ type Model struct {
 	speed    float64
 
 	window Window
+	styles styles
 }
 
 func (m Model) Init() tea.Cmd {
@@ -106,7 +106,7 @@ func (m Model) View() string {
 	}
 	sm := m.Speedbar.View()
 	sd := m.Statdash.View()
-	ic := styles.IcStyle.Render(lipgloss.JoinVertical(lipgloss.Center,
+	ic := m.styles.icStyle.Render(lipgloss.JoinVertical(lipgloss.Center,
 		m.Blinkers.View(),
 		"\n",
 		sm,
@@ -116,4 +116,26 @@ func (m Model) View() string {
 	)
 	s := ic
 	return lipgloss.Place(m.window.width, m.window.heigth, lipgloss.Center, lipgloss.Center, s)
+}
+
+func New(addr string, flag string, r *lipgloss.Renderer) tea.Model {
+
+	pm := progress.New(progress.WithColorProfile(r.ColorProfile()), progress.WithSolidFill("#FFC300"))
+	pm.ShowPercentage = false
+
+	// Blinkers model init
+	bm := blinkers.New(blinkers.WithRenderer(r))
+
+	// Status Dashboard model init
+	sm := statdash.New(statdash.WithRenderer(r))
+
+	m := Model{
+		Flag:     flag,
+		ApiAddr:  addr,
+		Sub:      make(chan api.UpdatePostData),
+		Blinkers: bm,
+		Speedbar: pm,
+		Statdash: sm,
+		styles:   makeStyles(r)}
+	return m
 }

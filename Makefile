@@ -1,4 +1,4 @@
-SRC_DIR=./cmd/
+SRC_DIR=./cmd/ic-tui
 BUILD_DIR=./build/
 SCRIPTS_DIR=./scripts/
 

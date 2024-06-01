@@ -7,7 +7,15 @@ const (
 	right string = "🡆"
 )
 
-var (
-	BlinkersActiveStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#33FF57")).Align(lipgloss.Center)
-	BlinkersInactiveStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#808080")).Align(lipgloss.Center)
-)
+type styles struct {
+	on  lipgloss.Style
+	off lipgloss.Style
+}
+
+func makeStyles(r *lipgloss.Renderer) styles {
+	return styles{
+		on:  r.NewStyle().Foreground(lipgloss.Color("#33FF57")).Align(lipgloss.Center),
+		off: r.NewStyle().Foreground(lipgloss.Color("#808080")).Align(lipgloss.Center),
+	}
+
+}
