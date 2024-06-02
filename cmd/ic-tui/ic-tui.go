@@ -27,9 +27,13 @@ const (
 	sshPort = "22"
 )
 
+var (
+	pm          program.Model
+	initialised = false
+)
+
 func main() {
 	cfg := args.ParseArgs()
-
 	if cfg.Ssh {
 		startWish(cfg)
 	} else {
@@ -41,7 +45,10 @@ func teaHandlerWrapper(cfg args.Args) func(s ssh.Session) (tea.Model, []tea.Prog
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 
 		r := bubbletea.MakeRenderer(s)
-		pm := program.New(cfg.Addr, "ctf{wroooom}", r)
+		if !initialised {
+			pm = program.New(cfg.Addr, "ctf{wroooom}", r)
+			initialised = true
+		}
 
 		return pm, []tea.ProgramOption{tea.WithAltScreen()}
 	}

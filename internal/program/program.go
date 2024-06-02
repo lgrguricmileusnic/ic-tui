@@ -47,9 +47,6 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		return m, tea.Quit
-
 	case tea.WindowSizeMsg:
 		m.Speedbar.Width = msg.Width - padding*2 - 4
 		if m.Speedbar.Width > maxWidth {
@@ -118,7 +115,7 @@ func (m Model) View() string {
 	return lipgloss.Place(m.window.width, m.window.heigth, lipgloss.Center, lipgloss.Center, s)
 }
 
-func New(addr string, flag string, r *lipgloss.Renderer) tea.Model {
+func New(addr string, flag string, r *lipgloss.Renderer) Model {
 
 	pm := progress.New(progress.WithColorProfile(r.ColorProfile()), progress.WithSolidFill("#FFC300"))
 	pm.ShowPercentage = false
